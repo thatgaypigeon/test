@@ -1,0 +1,40 @@
+name: Documentation
+run-name: Build & Deploy Dcumentation by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install MkDocs
+        run: pip install mkdocs
+
+      - name: Install dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build documentation
+        run: mkdocs build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./site/
+          github_token: ${{ secrets.GITHUB_TOKEN }}

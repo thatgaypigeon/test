@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "somos"
+version = "3.5.0rc0"
+description = "A Somos sequence generator for Python!"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+  {name="thatgaypigeon", email="pigeon43.stuff@gmail.com"},
+]
+keywords = ["somos", "sequence", "math", "maths", "mathematics", "oeis", "number", "numbers", "recurrence", "recurrence relation", "equation", "series", "A006720", "A006721", "A006722", "A006723", "A030127"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved",
+  "License :: OSI Approved :: MIT License",
+  'Intended Audience :: Developers',
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Other/Nonlisted Topic",
+  "Typing :: Typed"
+]
+
+[project.urls]
+"Documentation" = "http://somos.rtfd.io/"
+"Homepage" = "https://pigeon.uk.to/somos-py"
+"Issues / Bugs" = "https://github.com/thatgaypigeon/somos-py/issues"
+"PyPI" = "https://pypi.org/project/somos/"
+"Support Server" = "https://discord.gg/aB4Bw5pyTS"
+"Wikipedia Page" = "https://en.wikipedia.org/wiki/Somos_sequence"
+
+
+[tool.bumpversion]
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} \u2192 {new_version}"
+commit_args = ""
+tag = false
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} \u2192 {new_version}"
+current_version = "3.6.1-1"
+
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<release>dev|a|b|rc)(?P<build>\\d+))?"
+serialize = [
+	"{major}.{minor}.{patch}{release}{build}",
+	"{major}.{minor}.{patch}"
+]
+search = "{current_version}"
+replace = "{new_version}"
+
+[tool.bumpversion.parts.release]
+values = [
+  "",
+  "dev",
+  "a",
+	"b",
+	"rc"
+]
+optional = true
+
+[tool.bumpversion.parts.build]
+first_value = 0
+optional = true
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
+
+
+[tool.poetry]
+include = ["somos/py.typed"]

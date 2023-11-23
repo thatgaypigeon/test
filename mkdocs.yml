@@ -1,0 +1,144 @@
+# Project information
+site_name: somos-py
+site_url: https://pigeon.uk.to/projects/somos-py/
+site_author: Max Kerr
+site_description: >-
+  A Somos sequence generator in Python!
+
+docs_dir: "docs"
+site_dir: "site"
+
+use_directory_urls: true
+
+# Repository
+repo_name: thatgaypigeon/somos-py
+repo_url: https://github.com/thatgaypigeon/somos-py/
+
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2023 Max Kerr
+
+theme:
+  name: material # dracula
+  language: en
+  # custom_dir: src/docs/overrides
+
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Day mode!
+
+      primary: orange
+      accent: indigo
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Night mode!
+
+      primary: orange
+      accent: indigo
+
+    # Palette toggle for dark mode
+    # - media: "(prefers-color-scheme: dark)"
+    #   scheme: slate
+    #   toggle:
+    #     icon: material/brightness-4
+    #     name: Day mode!
+
+  font:
+    text: Poppins
+    code: Space Mono
+
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+  features:
+    # - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    # - header.autohide
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    # - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+    - toc.integrate
+
+  icon:
+    repo: fontawesome/solid/book-bookmark
+
+plugins:
+  - git-revision-date-localized:
+      enable_creation_date: true
+  # - offline    - not built-in?
+  # - optimize
+  # - privacy
+  # - projects
+  # - search
+  # - social:
+  #     cards_layout_options:
+  #       font_family: Noto Sans JP
+  # - tags
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra:
+  homepage: https://pigeon.uk.to/projects/somos-py/
+
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/thatgaypigeon/
+      name: Pigeon on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/somos/
+      name: Somos on PyPI
+    - icon: fontawesome/brands/discord
+      link: https://discordapp.com/users/745783208137719810
+      name: Pigeon on Discord
+    - icon: fontawesome/brands/mastodon
+      link: https://tech.lgbt/@thatgaypigeon/
+      name: Pigeon on Mastodon
+    - icon: fontawesome/brands/x-twitter
+      link: https://twitter.com/thatgaypigeon/
+      name: Pigeon on Twitter (X)
+
+  consent:
+    title: 🍪 Cookies
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+    actions:
+      - accept
+      - reject
+      - manage
+
+  generator: false
+
+  version:
+    default: latest
+    provider: mike
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

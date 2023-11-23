@@ -1,0 +1,204 @@
+name: Build & Deploy
+run-name: Build & Deploy by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - somos/**
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version type to bump (major, minor, patch)'
+        required: false
+        default: 'build'
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git config
+        run: |
+          git config --global user.name "thatgaypigeon"
+          git config --global user.email "pigeon43.stuff@gmail.com"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install bump-my-version
+        # run: pip install -r requirements.txt
+
+      # Stash version
+      - name: Stash version
+        shell: bash
+        id: set-version
+        run: |
+          export cur_ver=$(bump-my-version show new_version ${{ github.event.inputs.version || 'build' }})
+          export new_ver=$(bump-my-version show new_version --increment ${{ github.event.inputs.version || 'build' }})
+          echo "cur_version=$cur_ver" >> $GITHUB_OUTPUT
+          echo "new_version=$new_ver" >> $GITHUB_OUTPUT
+
+      # Bump
+      - name: Bump
+        id: bump
+        run: |
+          version=$(bump-my-version show new_version)
+          if [[ "${{ github.event.inputs.version || 'build' }}" == "build" ]] && [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            bump-my-version bump release || bump-my-version bump patch
+          else
+            bump-my-version bump ${{ github.event.inputs.version || 'build' }}
+          fi
+
+    outputs:
+      var_cur_version: ${{ steps.set-version.outputs.cur_version }}
+      var_new_version: ${{ steps.set-version.outputs.new_version }}
+
+  lint:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: bump
+
+    steps:
+      - name: Git config
+        run: |
+          git config --global user.name "thatgaypigeon"
+          git config --global user.email "pigeon43.stuff@gmail.com"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install pre-commit
+        # run: pip install -r requirements.txt
+
+      # Lint
+      - name: Lint
+        run: pre-commit run --all-files
+
+  test:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: [bump, lint]
+
+    steps:
+      - name: Git config
+        run: |
+          git config --global user.name "thatgaypigeon"
+          git config --global user.email "pigeon43.stuff@gmail.com"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install coverage bandit
+        # run: pip install -r requirements.txt
+
+      # Code coverage
+      - name: Run tests with coverage
+        run: coverage run -m unittest discover tests
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+      # Security checks
+      - name: Security checks
+        run: bandit -r .
+
+      # Pre-build commit
+      - name: Pre-build commit
+        run: |
+          git add .
+          git commit -m "Pre-build commit for ${{ needs.bump.outputs.var_new_version }}"
+
+  build:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: [bump, test]
+
+    steps:
+      - name: Git config
+        run: |
+          git config --global user.name "thatgaypigeon"
+          git config --global user.email "pigeon43.stuff@gmail.com"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install build
+        # run: pip install -r requirements.txt
+
+      - name: Build
+        id: build
+        run: python -m build
+
+  deploy:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: [bump, build]
+
+    steps:
+      - name: Git config
+        run: |
+          git config --global user.name "thatgaypigeon"
+          git config --global user.email "pigeon43.stuff@gmail.com"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Deploy build
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
+        with:
+          tag_name: "v${{ needs.bump.outputs.var_new_version }}"
+          release_name: "Release ${{ needs.bump.outputs.var_new_version }}"
+          draft: false
+          prerelease: false
+
+      # Deploy to PyPI
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
